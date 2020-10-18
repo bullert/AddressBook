@@ -1,9 +1,27 @@
 ﻿<Application x:Class="AddressBook.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:local="clr-namespace:AddressBook"
+             xmlns:views="clr-namespace:AddressBook.Views"
+             xmlns:viewmodels="clr-namespace:AddressBook.ViewModels"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-         
+        <ResourceDictionary>
+
+            <DataTemplate DataType="{x:Type viewmodels:AddressListViewModel}">
+                <views:AddressListView />
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type viewmodels:AddressListAddItemViewModel}">
+                <views:AddressListAddItemView />
+            </DataTemplate>
+            
+            <ResourceDictionary.MergedDictionaries>
+                <materialDesign:BundledTheme BaseTheme="Light" PrimaryColor="LightBlue" SecondaryColor="Amber" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Defaults.xaml" />
+                <ResourceDictionary Source="Style/DataGridColumnHeaderStyle.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            
+        </ResourceDictionary>
     </Application.Resources>
 </Application>

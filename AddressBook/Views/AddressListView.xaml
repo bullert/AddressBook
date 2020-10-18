@@ -1,0 +1,395 @@
+﻿<UserControl x:Class="AddressBook.Views.AddressListView"
+             x:Name="Root"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:AddressBook.Views"
+             xmlns:converters="clr-namespace:AddressBook.Converters"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes" 
+             xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+             mc:Ignorable="d">
+    
+    <UserControl.Resources>
+        <converters:GenderConverter x:Key="GenderConverter" />
+        <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+        
+        <Style x:Key="DataGridCellStyle" TargetType="{x:Type DataGridCell}" BasedOn="{StaticResource MaterialDesignDataGridCell}">
+            <Setter Property="Padding" Value="24 16" />
+            <Setter Property="Background" Value="{x:Null}" />
+            <Setter Property="BorderBrush" Value="{x:Null}" />
+            <Style.Triggers>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="{x:Null}" />
+                    <Setter Property="BorderBrush" Value="{x:Null}" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="DataGridTextColumnStyle" TargetType="{x:Type TextBlock}" BasedOn="{StaticResource MaterialDesignDataGridTextColumnStyle}">
+        </Style>
+    </UserControl.Resources>
+    
+    <Grid>
+        
+        <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        
+        <Grid Grid.Row="0" Margin="8 16">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <StackPanel Grid.Column="0" Orientation="Horizontal">
+                <Button 
+                    Content="ADD"
+                    Padding="16 5"
+                    Margin="2 0"
+                    Style="{StaticResource MaterialDesignFlatButton}"
+                    Foreground="{StaticResource PrimaryHueLightBrush}"
+                    Command="{Binding MainViewModel.UpdateViewCommand}"
+                    CommandParameter="AddressListAddItemViewModel" />
+                <Button 
+                    Content="EDIT MODE"
+                    Padding="16 5"
+                    Margin="2 0"
+                    Style="{StaticResource MaterialDesignFlatButton}"
+                    Foreground="{StaticResource PrimaryHueLightBrush}"
+                    Command="{Binding ToggleEditModeCommand}" />
+            </StackPanel>
+            <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button 
+                    Padding="12 5"
+                    Margin="2 0"
+                    ToolTip="Zapisz"
+                    materialDesign:RippleAssist.RippleSizeMultiplier=".7"
+                    Style="{StaticResource MaterialDesignToolButton}"
+                    Foreground="{StaticResource MaterialDesignToolTipBackground}"
+                    Command="{Binding SaveAddressListCommand}">
+                    <materialDesign:PackIcon Kind="ContentSave" Width="20" Height="20" />
+                </Button>
+                <Button 
+                    Padding="12 5"
+                    Margin="2 0"
+                    ToolTip="Usuń"
+                    materialDesign:RippleAssist.RippleSizeMultiplier=".7"
+                    Visibility="{Binding DataContext.IsEditModeEnabled, ElementName=Root, Converter={StaticResource BooleanToVisibilityConverter}, UpdateSourceTrigger=PropertyChanged}"
+                    Style="{StaticResource MaterialDesignToolButton}"
+                    Foreground="{StaticResource MaterialDesignToolTipBackground}"
+                    Command="{Binding DeleteSelectedSubscribersCommand}">
+                    <materialDesign:PackIcon Kind="Delete" Width="20" Height="20" />
+                </Button>
+            </StackPanel>
+        </Grid>
+        
+        <Separator
+            Style="{StaticResource MaterialDesignDarkSeparator}"
+            Padding="32"
+            Margin="0 28 0 -28"
+            Panel.ZIndex="1" />
+        
+        <Separator
+            Style="{StaticResource MaterialDesignDarkSeparator}"
+            Padding="32"
+            Margin="0 78 0 -78"
+            Panel.ZIndex="1" />
+
+        <StackPanel Grid.Row="1">
+
+            <DataGrid ItemsSource="{Binding FilteredSubscribersList}"
+                      CellStyle="{StaticResource DataGridCellStyle}"
+                      ColumnHeaderStyle="{StaticResource MaterialDesignDataGridColumnHeader}"
+                      Background="{StaticResource MaterialDesignBackground}"
+                      ColumnWidth="*"
+                      CanUserAddRows="False"
+                      AutoGenerateColumns="False" 
+                      CanUserResizeColumns="False"
+                      CanUserResizeRows="False"
+                      IsReadOnly="True">
+
+                <DataGrid.Columns>
+
+                    <DataGridTemplateColumn
+                        Width="96" >
+                        <DataGridTemplateColumn.HeaderTemplate>
+                            <DataTemplate>
+                                <Canvas>
+                                    <CheckBox
+                                        Margin="48 -36 -48 36" 
+                                        ToolTip="Zaznacz wszystko"
+                                        IsChecked="{Binding DataContext.ToggleSelectAll, ElementName=Root, UpdateSourceTrigger=PropertyChanged}"
+                                        Visibility="{Binding DataContext.IsEditModeEnabled, ElementName=Root, Converter={StaticResource BooleanToVisibilityConverter}, UpdateSourceTrigger=PropertyChanged}">
+                                        <CheckBox.LayoutTransform>
+                                            <ScaleTransform ScaleX="1.2" ScaleY="1.2" />
+                                        </CheckBox.LayoutTransform>
+                                    </CheckBox>
+                                </Canvas>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.HeaderTemplate>
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Canvas>
+                                    <CheckBox
+                                        Margin="48 -4 -48 4"
+                                        ToolTip="Zaznacz"
+                                        IsChecked="{Binding CanDelete, UpdateSourceTrigger=PropertyChanged}"
+                                        Visibility="{Binding DataContext.IsEditModeEnabled, ElementName=Root, Converter={StaticResource BooleanToVisibilityConverter}, UpdateSourceTrigger=PropertyChanged}">
+                                        <CheckBox.LayoutTransform>
+                                            <ScaleTransform ScaleX="1.2" ScaleY="1.2" />
+                                        </CheckBox.LayoutTransform>
+                                    </CheckBox>
+                                    <Button
+                                        Style="{StaticResource MaterialDesignToolForegroundButton}"
+                                        Foreground="{StaticResource MaterialDesignToolTipBackground}"
+                                        Margin="0 -8"
+                                        Padding="0"
+                                        ToolTip="Edytuj"
+                                        materialDesign:RippleAssist.IsDisabled="True"
+                                        Command="{Binding DataContext.EditSubscriberCommand, ElementName=Root}"
+                                        CommandParameter="{Binding}"
+                                        Visibility="{Binding DataContext.IsEditModeEnabled, ElementName=Root, Converter={StaticResource BooleanToVisibilityConverter}, UpdateSourceTrigger=PropertyChanged}">
+                                        <materialDesign:PackIcon
+                                            Kind="Edit"
+                                            Width="20"
+                                            Height="20" />
+                                    </Button>
+                                </Canvas>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
+                    <DataGridTextColumn 
+                        Header="Imię" 
+                        Binding="{Binding FirstName}" 
+                        ElementStyle="{StaticResource DataGridTextColumnStyle}">
+                        <DataGridTextColumn.HeaderTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition />
+                                        <RowDefinition />
+                                    </Grid.RowDefinitions>
+                                    <TextBlock Grid.Row="0" Text="{Binding Content, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
+                                    <Canvas Grid.Row="1">
+                                        <TextBox
+                                            Text="{Binding DataContext.FirstNameFilter, ElementName=Root, UpdateSourceTrigger=PropertyChanged}"
+                                            materialDesign:HintAssist.Hint="Filter..."
+                                            materialDesign:TextFieldAssist.HasClearButton="True" />
+                                    </Canvas>
+                                </Grid>
+                            </DataTemplate>
+                        </DataGridTextColumn.HeaderTemplate>
+                    </DataGridTextColumn>
+
+                    <DataGridTextColumn Header="Nazwisko" 
+                                        Binding="{Binding LastName}" 
+                                        ElementStyle="{StaticResource DataGridTextColumnStyle}">
+                        <DataGridTextColumn.HeaderTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition />
+                                        <RowDefinition />
+                                    </Grid.RowDefinitions>
+                                    <TextBlock Grid.Row="0" Text="{Binding Content, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
+                                    <Canvas Grid.Row="1">
+                                        <TextBox
+                                            Text="{Binding DataContext.LastNameFilter, ElementName=Root, UpdateSourceTrigger=PropertyChanged}"
+                                            materialDesign:HintAssist.Hint="Filter..."
+                                            materialDesign:TextFieldAssist.HasClearButton="True" />
+                                    </Canvas>
+                                </Grid>
+                            </DataTemplate>
+                        </DataGridTextColumn.HeaderTemplate>
+                    </DataGridTextColumn>
+
+                    <DataGridTextColumn Header="Płeć" 
+                                        Binding="{Binding Gender, Converter={StaticResource GenderConverter}}" 
+                                        ElementStyle="{StaticResource DataGridTextColumnStyle}">
+                        <DataGridTextColumn.HeaderTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition />
+                                        <RowDefinition />
+                                    </Grid.RowDefinitions>
+                                    <TextBlock Grid.Row="0" Text="{Binding Content, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
+                                    <Canvas Grid.Row="1">
+                                        <ComboBox 
+                                            Margin="0 11 0 11"
+                                            Padding="0 5"
+                                            SelectedValue="{Binding DataContext.GenderFilter, ElementName=Root, UpdateSourceTrigger=PropertyChanged}"
+                                            ItemsSource="{Binding DataContext.GenderAdapter.ExtendedPairsList, ElementName=Root}"
+                                            SelectedValuePath="Key"
+                                            DisplayMemberPath="Value"
+                                            materialDesign:HintAssist.Hint="Filter...">
+                                        </ComboBox>
+                                    </Canvas>
+                                </Grid>
+                            </DataTemplate>
+                        </DataGridTextColumn.HeaderTemplate>
+                    </DataGridTextColumn>
+
+                    <DataGridTextColumn Header="Rok urodzenia" 
+                                        Binding="{Binding YearOfBirth}" 
+                                        ElementStyle="{StaticResource DataGridTextColumnStyle}">
+                        <DataGridTextColumn.HeaderTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition />
+                                        <RowDefinition />
+                                    </Grid.RowDefinitions>
+                                    <TextBlock Grid.Row="0" Text="{Binding Content, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
+                                    <Canvas Grid.Row="1">
+                                        <StackPanel>
+                                            <Grid Height="auto">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition />
+                                                    <ColumnDefinition />
+                                                </Grid.ColumnDefinitions>
+                                                <ComboBox 
+                                                    Grid.Column="0"
+                                                    Width="auto"
+                                                    Margin="0 11 12 11"
+                                                    Padding="0 5"
+                                                    SelectedValue="{Binding DataContext.YearOfBirthMinRangeFilter, ElementName=Root, UpdateSourceTrigger=PropertyChanged}"
+                                                    ItemsSource="{Binding DataContext.YearOfBirthAdapter.ExtendedPairsList, ElementName=Root}"
+                                                    SelectedValuePath="Key"
+                                                    DisplayMemberPath="Value"
+                                                    materialDesign:HintAssist.Hint="..."
+                                                    materialDesign:TextFieldAssist.PrefixText="od ">
+                                                    <ComboBox.ItemTemplate>
+                                                        <DataTemplate>
+                                                            <StackPanel>
+                                                                <TextBlock Text="{Binding Value}" />
+                                                            </StackPanel>
+                                                        </DataTemplate>
+                                                    </ComboBox.ItemTemplate>
+                                                </ComboBox>
+                                                <ComboBox 
+                                                    Grid.Column="1"
+                                                    Width="auto"
+                                                    Margin="12 11 0 11"
+                                                    Padding="0 5"
+                                                    SelectedValue="{Binding DataContext.YearOfBirthMaxRangeFilter, ElementName=Root, UpdateSourceTrigger=PropertyChanged}"
+                                                    ItemsSource="{Binding DataContext.YearOfBirthAdapter.ExtendedPairsList, ElementName=Root}"
+                                                    SelectedValuePath="Key"
+                                                    DisplayMemberPath="Value"
+                                                    materialDesign:HintAssist.Hint="..."
+                                                    materialDesign:TextFieldAssist.PrefixText="do ">
+                                                    <ComboBox.ItemTemplate>
+                                                        <DataTemplate>
+                                                            <StackPanel>
+                                                                <TextBlock Text="{Binding Value}" />
+                                                            </StackPanel>
+                                                        </DataTemplate>
+                                                    </ComboBox.ItemTemplate>
+                                                </ComboBox>
+                                            </Grid>
+                                        </StackPanel>
+                                    </Canvas>
+                                </Grid>
+                            </DataTemplate>
+                        </DataGridTextColumn.HeaderTemplate>
+                    </DataGridTextColumn>
+
+                    <DataGridTextColumn Header="Miasto" 
+                                        Binding="{Binding Address.City}" 
+                                        ElementStyle="{StaticResource DataGridTextColumnStyle}">
+                        <DataGridTextColumn.HeaderTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition />
+                                        <RowDefinition />
+                                    </Grid.RowDefinitions>
+                                    <TextBlock Grid.Row="0" Text="{Binding Content, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
+                                    <Canvas Grid.Row="1">
+                                        <TextBox
+                                            Text="{Binding DataContext.CityFilter, ElementName=Root, UpdateSourceTrigger=PropertyChanged}"
+                                            materialDesign:HintAssist.Hint="Filter..."
+                                            materialDesign:TextFieldAssist.HasClearButton="True" />
+                                    </Canvas>
+                                </Grid>
+                            </DataTemplate>
+                        </DataGridTextColumn.HeaderTemplate>
+                    </DataGridTextColumn>
+
+                    <DataGridTextColumn Header="Ulica" 
+                                        Binding="{Binding Address.Street}" 
+                                        ElementStyle="{StaticResource DataGridTextColumnStyle}">
+                        <DataGridTextColumn.HeaderTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition />
+                                        <RowDefinition />
+                                    </Grid.RowDefinitions>
+                                    <TextBlock Grid.Row="0" Text="{Binding Content, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
+                                    <Canvas Grid.Row="1">
+                                        <TextBox
+                                            Text="{Binding DataContext.StreetFilter, ElementName=Root, UpdateSourceTrigger=PropertyChanged}"
+                                            materialDesign:HintAssist.Hint="Filter..."
+                                            materialDesign:TextFieldAssist.HasClearButton="True" />
+                                    </Canvas>
+                                </Grid>
+                            </DataTemplate>
+                        </DataGridTextColumn.HeaderTemplate>
+                    </DataGridTextColumn>
+
+                    <DataGridTextColumn Header="Numer mieszkania" 
+                                        Binding="{Binding Address.PropertyNumber}" 
+                                        ElementStyle="{StaticResource DataGridTextColumnStyle}">
+                        <DataGridTextColumn.HeaderTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition />
+                                        <RowDefinition />
+                                    </Grid.RowDefinitions>
+                                    <TextBlock Grid.Row="0" Text="{Binding Content, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
+                                    <Canvas Grid.Row="1">
+                                        <TextBox
+                                            Text="{Binding DataContext.PropertyNumberFilter, ElementName=Root, UpdateSourceTrigger=PropertyChanged}"
+                                            materialDesign:HintAssist.Hint="Filter..."
+                                            materialDesign:TextFieldAssist.HasClearButton="True" />
+                                    </Canvas>
+                                </Grid>
+                            </DataTemplate>
+                        </DataGridTextColumn.HeaderTemplate>
+                    </DataGridTextColumn>
+                    
+                    <DataGridTextColumn Header="Kod pocztowy" 
+                                        Binding="{Binding Address.Postcode}" 
+                                        ElementStyle="{StaticResource DataGridTextColumnStyle}">
+                        <DataGridTextColumn.HeaderTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition />
+                                        <RowDefinition />
+                                    </Grid.RowDefinitions>
+                                    <TextBlock Grid.Row="0" Text="{Binding Content, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
+                                    <Canvas Grid.Row="1">
+                                        <TextBox
+                                            Text="{Binding DataContext.PostcodeFilter, ElementName=Root, UpdateSourceTrigger=PropertyChanged}"
+                                            materialDesign:HintAssist.Hint="Filter..."
+                                            materialDesign:TextFieldAssist.HasClearButton="True" />
+                                    </Canvas>
+                                </Grid>
+                            </DataTemplate>
+                        </DataGridTextColumn.HeaderTemplate>
+                    </DataGridTextColumn>
+                    
+                </DataGrid.Columns>
+            </DataGrid>
+        </StackPanel>
+
+        <StackPanel Grid.Row="2" Height="48">
+        </StackPanel>
+    </Grid>
+    
+</UserControl>

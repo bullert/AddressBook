@@ -3,10 +3,48 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         xmlns:local="clr-namespace:AddressBook"
+        xmlns:viewmodels="clr-namespace:AddressBook.ViewModels"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
+        Title="MainWindow"
+        MinWidth="720"
+        MinHeight="540"
+        WindowState="Maximized"
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        TextElement.FontWeight="Regular"
+        TextElement.FontSize="13"
+        TextOptions.TextFormattingMode="Ideal"
+        TextOptions.TextRenderingMode="Auto"
+        Background="{DynamicResource MaterialDesignPaper}"
+        FontFamily="{DynamicResource MaterialDesignFont}">
         
-    </Grid>
+    <Window.DataContext>
+        <viewmodels:MainViewModel />
+    </Window.DataContext>
+    
+    <StackPanel>
+        
+        <materialDesign:ColorZone Mode="PrimaryMid"
+                                  materialDesign:ShadowAssist.ShadowDepth="Depth2"
+                                  ClipToBounds="False">
+            <StackPanel MaxWidth="1600">
+                <TextBlock Text="Książka adresowa"
+                           Style="{DynamicResource MaterialDesignHeadline6TextBlock}"
+                           Foreground="{StaticResource MaterialDesignBodyLight}"
+                           Padding="64 64"
+                           HorizontalAlignment="Center" />
+            </StackPanel>
+        </materialDesign:ColorZone>
+        
+        <StackPanel MaxWidth="1200">
+            <materialDesign:Card Padding="0" Margin="56" >
+                
+                <ContentControl Content="{Binding SelectedViewModel, UpdateSourceTrigger=PropertyChanged}" />
+                
+            </materialDesign:Card>
+        </StackPanel>
+
+    </StackPanel>
+    
 </Window>
